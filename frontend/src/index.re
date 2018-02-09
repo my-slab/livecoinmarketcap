@@ -1,1 +1,4 @@
-ReactDOMRe.renderToElementWithId(<Page message="Hello!" />, "index");
+ReactDOMRe.renderToElementWithId(
+  <Page message=" Live Cryptocurrency Market Capitalizations" />,
+  "index"
+);
