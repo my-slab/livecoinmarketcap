@@ -11,7 +11,7 @@ defmodule Backend.Application do
       # Start the Ecto repository
       supervisor(Backend.Repo, []),
       # Start the endpoint when the application starts
-      supervisor(BackendWeb.Endpoint, []),
+      supervisor(BackendWeb.Endpoint, [])
       # Start your own worker by calling: Backend.Worker.start_link(arg1, arg2, arg3)
       # worker(Backend.Worker, [arg1, arg2, arg3]),
     ]
