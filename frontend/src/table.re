@@ -1,3 +1,4 @@
+/* Currency.re */
 let component = ReasonReact.statelessComponent("Table");
 
 let make = _children => {
