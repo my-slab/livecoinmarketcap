@@ -1,12 +1,8 @@
-type direction =
-  | Asc
-  | Desc;
-
 type action =
-  | Click(string, direction);
+  | Click(string, Direction.direction);
 
 type state = {
-  direction,
+  direction: Direction.direction,
   key: string
 };
 
@@ -29,8 +25,8 @@ let columns = [
 
 let toggleDirection = direction =>
   switch direction {
-  | Asc => Desc
-  | Desc => Asc
+  | Direction.Asc => Direction.Desc
+  | Direction.Desc => Direction.Asc
   };
 
 let make = _children => {
@@ -57,6 +53,11 @@ let make = _children => {
                      _event =>
                        self.send(Click(column.key, self.state.direction))
                    )>
+                   (
+                     self.state.key == column.key ?
+                       <Chevron direction=self.state.direction /> :
+                       ReasonReact.nullElement
+                   )
                    (ReasonReact.stringToElement(column.display))
                  </th>
                )
