@@ -1,8 +1,8 @@
 type action =
-  | Click(string, Direction.direction);
+  | Click(string, Sort.direction);
 
 type state = {
-  direction: Direction.direction,
+  direction: Sort.direction,
   key: string
 };
 
@@ -23,22 +23,18 @@ let columns = [
   {display: "Change (24h)", key: "percent_change_24h"}
 ];
 
-let toggleDirection = direction =>
-  switch direction {
-  | Direction.Asc => Direction.Desc
-  | Direction.Desc => Direction.Asc
-  };
-
 let make = _children => {
   ...component,
   initialState: () => {
     key: columns |> List.hd |> (column => column.key),
     direction: Desc
   },
-  reducer: (action, _state) =>
+  reducer: (action, state) =>
     switch action {
     | Click(key, direction) =>
-      ReasonReact.Update({direction: toggleDirection(direction), key})
+      key == state.key ?
+        ReasonReact.Update({direction: Sort.toggle(direction), key}) :
+        ReasonReact.Update({direction: Desc, key})
     },
   render: self =>
     <table>
@@ -50,12 +46,14 @@ let make = _children => {
                  <th
                    key=column.key
                    onClick=(
-                     _event =>
-                       self.send(Click(column.key, self.state.direction))
+                     event => {
+                       ReactEventRe.Mouse.preventDefault(event);
+                       self.send(Click(column.key, self.state.direction));
+                     }
                    )>
                    (
                      self.state.key == column.key ?
-                       <Chevron direction=self.state.direction /> :
+                       <Sort direction=self.state.direction /> :
                        ReasonReact.nullElement
                    )
                    (ReasonReact.stringToElement(column.display))

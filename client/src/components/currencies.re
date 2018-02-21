@@ -1,11 +1,11 @@
 type coin = {
-  available_supply: string,
-  hour_volume_24h: string,
-  market_cap_usd: string,
+  available_supply: float,
+  hour_volume_24h: float,
+  market_cap_usd: float,
   name: string,
-  percent_change_24h: string,
-  price: string,
-  rank: string
+  percent_change_24h: float,
+  price: float,
+  rank: float
 };
 
 type state =
@@ -23,15 +23,20 @@ let component = ReasonReact.reducerComponent("Currencies");
 module Decode = {
   let decode = json =>
     Json.Decode.{
-      available_supply: json |> field("available_supply", string),
-      hour_volume_24h: json |> field("24h_volume_usd", string),
-      market_cap_usd: json |> field("market_cap_usd", string),
+      available_supply:
+        json |> field("available_supply", string) |> float_of_string,
+      hour_volume_24h:
+        json |> field("24h_volume_usd", string) |> float_of_string,
+      market_cap_usd:
+        json |> field("market_cap_usd", string) |> float_of_string,
       name: json |> field("name", string),
-      percent_change_24h: json |> field("percent_change_24h", string),
-      price: json |> field("price_usd", string),
-      rank: json |> field("rank", string)
+      percent_change_24h:
+        json |> field("percent_change_24h", string) |> float_of_string,
+      price: json |> field("price_usd", string) |> float_of_string,
+      rank: json |> field("rank", string) |> float_of_string
     };
   let coins = json => json |> Json.Decode.list(decode);
+  Js.log(coins);
 };
 
 let make = (~columns, _children) => {
@@ -73,18 +78,45 @@ let make = (~columns, _children) => {
         | Fetching => <Message columns text="Fetching" />
         | Success(coins) =>
           coins
+          /* |> List.sort((a, b)
+             /* Must use Map for dynamic access as records are static */
+             => a[self.state.key] > b[self.state.key] ? 1 : (-1)) */
           |> List.map(coin =>
                <tr key=coin.name>
-                 <td> (ReasonReact.stringToElement(coin.rank)) </td>
-                 <td> (ReasonReact.stringToElement(coin.name)) </td>
-                 <td> (ReasonReact.stringToElement(coin.market_cap_usd)) </td>
-                 <td> (ReasonReact.stringToElement(coin.price)) </td>
-                 <td> (ReasonReact.stringToElement(coin.hour_volume_24h)) </td>
                  <td>
-                   (ReasonReact.stringToElement(coin.available_supply))
+                   (ReasonReact.stringToElement(string_of_float(coin.rank)))
+                 </td>
+                 <td> (ReasonReact.stringToElement(coin.name)) </td>
+                 <td>
+                   (
+                     ReasonReact.stringToElement(
+                       string_of_float(coin.market_cap_usd)
+                     )
+                   )
                  </td>
                  <td>
-                   (ReasonReact.stringToElement(coin.percent_change_24h))
+                   (ReasonReact.stringToElement(string_of_float(coin.price)))
+                 </td>
+                 <td>
+                   (
+                     ReasonReact.stringToElement(
+                       string_of_float(coin.hour_volume_24h)
+                     )
+                   )
+                 </td>
+                 <td>
+                   (
+                     ReasonReact.stringToElement(
+                       string_of_float(coin.available_supply)
+                     )
+                   )
+                 </td>
+                 <td>
+                   (
+                     ReasonReact.stringToElement(
+                       string_of_float(coin.percent_change_24h)
+                     )
+                   )
                  </td>
                </tr>
              )
