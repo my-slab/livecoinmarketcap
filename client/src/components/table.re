@@ -56,7 +56,7 @@ let make = _children => {
                        <Sort direction=self.state.direction /> :
                        ReasonReact.nullElement
                    )
-                   (ReasonReact.stringToElement(column.display))
+                   <Text value=column.display />
                  </th>
                )
             |> Array.of_list

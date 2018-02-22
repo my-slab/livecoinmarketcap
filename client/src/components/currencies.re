@@ -5,7 +5,7 @@ type coin = {
   name: string,
   percent_change_24h: float,
   price: float,
-  rank: float
+  rank: int
 };
 
 type state =
@@ -33,7 +33,7 @@ module Decode = {
       percent_change_24h:
         json |> field("percent_change_24h", string) |> float_of_string,
       price: json |> field("price_usd", string) |> float_of_string,
-      rank: json |> field("rank", string) |> float_of_string
+      rank: json |> field("rank", string) |> int_of_string
     };
   let coins = json => json |> Json.Decode.list(decode);
   Js.log(coins);
@@ -58,7 +58,10 @@ let make = (~columns, _children) => {
                    |> (coins => self.send(CoinsFetchSuccess(coins)))
                    |> resolve
                  )
-              |> catch(_err => Js.Promise.resolve(self.send(CoinsFetchFail)))
+              |> catch(err => {
+                   Js.log(err);
+                   Js.Promise.resolve(self.send(CoinsFetchFail));
+                 })
               |> ignore
             )
         )
@@ -83,41 +86,13 @@ let make = (~columns, _children) => {
              => a[self.state.key] > b[self.state.key] ? 1 : (-1)) */
           |> List.map(coin =>
                <tr key=coin.name>
-                 <td>
-                   (ReasonReact.stringToElement(string_of_float(coin.rank)))
-                 </td>
-                 <td> (ReasonReact.stringToElement(coin.name)) </td>
-                 <td>
-                   (
-                     ReasonReact.stringToElement(
-                       string_of_float(coin.market_cap_usd)
-                     )
-                   )
-                 </td>
-                 <td>
-                   (ReasonReact.stringToElement(string_of_float(coin.price)))
-                 </td>
-                 <td>
-                   (
-                     ReasonReact.stringToElement(
-                       string_of_float(coin.hour_volume_24h)
-                     )
-                   )
-                 </td>
-                 <td>
-                   (
-                     ReasonReact.stringToElement(
-                       string_of_float(coin.available_supply)
-                     )
-                   )
-                 </td>
-                 <td>
-                   (
-                     ReasonReact.stringToElement(
-                       string_of_float(coin.percent_change_24h)
-                     )
-                   )
-                 </td>
+                 <td> <Int value=coin.rank /> </td>
+                 <td> <Text value=coin.name /> </td>
+                 <td> <Float value=coin.market_cap_usd /> </td>
+                 <td> <Float value=coin.price /> </td>
+                 <td> <Float value=coin.hour_volume_24h /> </td>
+                 <td> <Float value=coin.available_supply /> </td>
+                 <td> <Percentage value=coin.percent_change_24h /> </td>
                </tr>
              )
           |> Array.of_list
