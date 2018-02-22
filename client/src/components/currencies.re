@@ -39,7 +39,59 @@ module Decode = {
   Js.log(coins);
 };
 
-let make = (~columns, _children) => {
+let fetch_coins = (self: ReasonReact.self('a, 'b, 'c), offset) =>
+  Js.Promise.(
+    Fetch.fetch(
+      "https://api.coinmarketcap.com/v1/ticker/?start="
+      ++ string_of_int(offset)
+    )
+    |> then_(Fetch.Response.json)
+    |> then_(json =>
+         json
+         |> Decode.coins
+         |> (coins => self.send(CoinsFetchSuccess(coins)))
+         |> resolve
+       )
+    |> catch(err => {
+         Js.log(err);
+         Js.Promise.resolve(self.send(CoinsFetchFail));
+       })
+    |> ignore
+  );
+
+let sort_coins = (key, direction, coins) =>
+  (
+    switch key {
+    | "rank" => coins |> List.sort((a, b) => a.rank - b.rank)
+    | "name" => coins |> List.sort((a, b) => a.name > b.name ? 1 : (-1))
+    | "market_cap_usd" =>
+      coins
+      |> List.sort((a, b) => a.market_cap_usd > b.market_cap_usd ? 1 : (-1))
+    | "price" => coins |> List.sort((a, b) => a.price > b.price ? 1 : (-1))
+    | "hour_volume_24h" =>
+      coins
+      |> List.sort((a, b) => a.hour_volume_24h > b.hour_volume_24h ? 1 : (-1))
+    | "available_supply" =>
+      coins
+      |> List.sort((a, b) =>
+           a.available_supply > b.available_supply ? 1 : (-1)
+         )
+    | "percent_change_24h" =>
+      coins
+      |> List.sort((a, b) =>
+           a.percent_change_24h > b.percent_change_24h ? 1 : (-1)
+         )
+    | _ => coins
+    }
+  )
+  |> (
+    switch direction {
+    | Sort.Asc => List.rev
+    | Sort.Desc => (i => i)
+    }
+  );
+
+let make = (~columns, ~sort_by, ~direction, _children) => {
   ...component,
   initialState: _state => Fetching,
   reducer: (action, _state) =>
@@ -47,24 +99,7 @@ let make = (~columns, _children) => {
     | CoinsFetch =>
       ReasonReact.UpdateWithSideEffects(
         Fetching,
-        (
-          self =>
-            Js.Promise.(
-              Fetch.fetch("https://api.coinmarketcap.com/v1/ticker/")
-              |> then_(Fetch.Response.json)
-              |> then_(json =>
-                   json
-                   |> Decode.coins
-                   |> (coins => self.send(CoinsFetchSuccess(coins)))
-                   |> resolve
-                 )
-              |> catch(err => {
-                   Js.log(err);
-                   Js.Promise.resolve(self.send(CoinsFetchFail));
-                 })
-              |> ignore
-            )
-        )
+        (self => fetch_coins(self, 0))
       )
     | CoinsFetchFail => ReasonReact.Update(Fail)
     | CoinsFetchSuccess(coins) => ReasonReact.Update(Success(coins))
@@ -81,9 +116,7 @@ let make = (~columns, _children) => {
         | Fetching => <Message columns text="Fetching" />
         | Success(coins) =>
           coins
-          /* |> List.sort((a, b)
-             /* Must use Map for dynamic access as records are static */
-             => a[self.state.key] > b[self.state.key] ? 1 : (-1)) */
+          |> sort_coins(sort_by, direction)
           |> List.map(coin =>
                <tr key=coin.name>
                  <td> <Int value=coin.rank /> </td>

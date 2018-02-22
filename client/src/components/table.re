@@ -64,6 +64,10 @@ let make = _children => {
           )
         </tr>
       </thead>
-      <Currencies columns=(List.length(columns)) />
+      <Currencies
+        columns=(List.length(columns))
+        direction=self.state.direction
+        sort_by=self.state.key
+      />
     </table>
 };
