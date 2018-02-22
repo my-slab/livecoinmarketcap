@@ -61,24 +61,21 @@ let fetch_coins = (self: ReasonReact.self('a, 'b, 'c), offset) =>
 let sort_coins = (key, direction, coins) =>
   (
     switch key {
-    | "rank" => coins |> List.sort((a, b) => a.rank - b.rank)
-    | "name" => coins |> List.sort((a, b) => a.name > b.name ? 1 : (-1))
+    | "rank" => coins |> List.sort((a, b) => compare(a.rank, b.rank))
+    | "name" => coins |> List.sort((a, b) => compare(a.name, b.name))
     | "market_cap_usd" =>
-      coins
-      |> List.sort((a, b) => a.market_cap_usd > b.market_cap_usd ? 1 : (-1))
-    | "price" => coins |> List.sort((a, b) => a.price > b.price ? 1 : (-1))
+      coins |> List.sort((a, b) => compare(a.market_cap_usd, b.market_cap_usd))
+    | "price" => coins |> List.sort((a, b) => compare(a.price, b.price))
     | "hour_volume_24h" =>
       coins
-      |> List.sort((a, b) => a.hour_volume_24h > b.hour_volume_24h ? 1 : (-1))
+      |> List.sort((a, b) => compare(a.hour_volume_24h, b.hour_volume_24h))
     | "available_supply" =>
       coins
-      |> List.sort((a, b) =>
-           a.available_supply > b.available_supply ? 1 : (-1)
-         )
+      |> List.sort((a, b) => compare(a.available_supply, b.available_supply))
     | "percent_change_24h" =>
       coins
       |> List.sort((a, b) =>
-           a.percent_change_24h > b.percent_change_24h ? 1 : (-1)
+           compare(a.percent_change_24h, b.percent_change_24h)
          )
     | _ => coins
     }
