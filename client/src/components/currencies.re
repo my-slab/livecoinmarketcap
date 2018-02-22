@@ -36,7 +36,6 @@ module Decode = {
       rank: json |> field("rank", string) |> int_of_string
     };
   let coins = json => json |> Json.Decode.list(decode);
-  Js.log(coins);
 };
 
 let fetch_coins = (self: ReasonReact.self('a, 'b, 'c), offset) =>
