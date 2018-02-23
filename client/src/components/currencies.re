@@ -118,7 +118,7 @@ let make = (~columns, ~sort_by, ~direction, _children) => {
                  <td> <Int value=coin.rank /> </td>
                  <td> <Text value=coin.name /> </td>
                  <td> <Float value=coin.market_cap_usd /> </td>
-                 <td> <Float value=coin.price /> </td>
+                 <td> <Fiat value=coin.price /> </td>
                  <td> <Float value=coin.hour_volume_24h /> </td>
                  <td> <Float value=coin.available_supply /> </td>
                  <td> <Percentage value=coin.percent_change_24h /> </td>
