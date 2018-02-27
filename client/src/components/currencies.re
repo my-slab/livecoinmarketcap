@@ -5,7 +5,8 @@ type coin = {
   name: string,
   percent_change_24h: float,
   price: float,
-  rank: int
+  rank: int,
+  symbol: string
 };
 
 type state =
@@ -33,7 +34,8 @@ module Decode = {
       percent_change_24h:
         json |> field("percent_change_24h", string) |> float_of_string,
       price: json |> field("price_usd", string) |> float_of_string,
-      rank: json |> field("rank", string) |> int_of_string
+      rank: json |> field("rank", string) |> int_of_string,
+      symbol: json |> field("symbol", string)
     };
   let coins = json => json |> Json.Decode.list(decode);
 };
@@ -117,10 +119,14 @@ let make = (~columns, ~sort_by, ~direction, _children) => {
                <tr key=coin.name>
                  <td> <Int value=coin.rank /> </td>
                  <td> <Text value=coin.name /> </td>
-                 <td> <Float value=coin.market_cap_usd /> </td>
-                 <td> <Fiat value=coin.price /> </td>
-                 <td> <Float value=coin.hour_volume_24h /> </td>
-                 <td> <Float value=coin.available_supply /> </td>
+                 <td> <Fiat value=coin.market_cap_usd /> </td>
+                 <td> <Fiat value=coin.price precision=2 /> </td>
+                 <td> <Fiat value=coin.hour_volume_24h /> </td>
+                 <td>
+                   <Float value=coin.available_supply />
+                   <Text value=" " />
+                   <Text value=coin.symbol />
+                 </td>
                  <td> <Percentage value=coin.percent_change_24h /> </td>
                </tr>
              )

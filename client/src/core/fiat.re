@@ -1,6 +1,6 @@
 let component = ReasonReact.statelessComponent("Percentage");
 
-let make = (~value: float, _children) => {
+let make = (~value: float, ~precision=0, _children) => {
   ...component,
-  render: _self => <span> <Text value="$" /> <Float value /> </span>
+  render: _self => <span> <Text value="$" /> <Float value precision /> </span>
 };
