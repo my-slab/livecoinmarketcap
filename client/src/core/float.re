@@ -1,19 +1,17 @@
 let component = ReasonReact.statelessComponent("Text");
 
-let make = (~value: float, ~precision=0, _children) => {
+let toLocale: float => string = [%bs.raw
+  {|
+    function(value) {
+      const number = Number(value);
+      const { language = 'us-US' } = navigator;
+
+      return number.toLocaleString(language);
+    }
+  |}
+];
+
+let make = (~value: float, _children) => {
   ...component,
-  render: _self =>
-    <span>
-      (
-        value
-        |> (
-          switch precision {
-          | 0 => Printf.sprintf("%.0f")
-          | 2 => Printf.sprintf("%.2f")
-          | _ => Printf.sprintf("%.2f")
-          }
-        )
-        |> ReasonReact.stringToElement
-      )
-    </span>
+  render: _self => <span> <Text value=(toLocale(value)) /> </span>
 };
