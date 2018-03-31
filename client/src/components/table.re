@@ -1,9 +1,15 @@
+type paginate =
+  | Next
+  | Previous;
+
 type action =
-  | Click(string, Sort.direction);
+  | Click(string, Sort.direction)
+  | Paginate(paginate, int);
 
 type state = {
   direction: Sort.direction,
-  key: string
+  key: string,
+  offset: int
 };
 
 type column = {
@@ -26,48 +32,87 @@ let columns = [
 let make = _children => {
   ...component,
   initialState: () => {
+    direction: Desc,
     key: columns |> List.hd |> (column => column.key),
-    direction: Desc
+    offset: 0
   },
   reducer: (action, state) =>
     switch action {
     | Click(key, direction) =>
       key == state.key ?
-        ReasonReact.Update({direction: Sort.toggle(direction), key}) :
-        ReasonReact.Update({direction: Desc, key})
+        ReasonReact.Update({
+          ...state,
+          direction: Sort.toggle(direction),
+          key
+        }) :
+        ReasonReact.Update({...state, direction: Desc, key})
+    | Paginate(direction, offset) =>
+      let offset =
+        switch direction {
+        | Next => offset + 100
+        | Previous => offset == 0 ? offset : offset - 100
+        };
+      Js.log(offset);
+      ReasonReact.Update({...state, offset});
     },
   render: self =>
-    <table>
-      <thead>
-        <tr>
-          (
-            columns
-            |> List.map(column =>
-                 <th
-                   key=column.key
-                   onClick=(
-                     event => {
-                       ReactEventRe.Mouse.preventDefault(event);
-                       self.send(Click(column.key, self.state.direction));
-                     }
-                   )>
-                   (
-                     self.state.key == column.key ?
-                       <Sort direction=self.state.direction /> :
-                       ReasonReact.nullElement
-                   )
-                   <Text value=column.display />
-                 </th>
-               )
-            |> Array.of_list
-            |> ReasonReact.arrayToElement
-          )
-        </tr>
-      </thead>
-      <Currencies
-        columns=(List.length(columns))
-        direction=self.state.direction
-        sort_by=self.state.key
-      />
-    </table>
+    <div>
+      <table>
+        <thead>
+          <tr>
+            (
+              columns
+              |> List.map(column =>
+                   <th
+                     key=column.key
+                     onClick=(
+                       event => {
+                         ReactEventRe.Mouse.preventDefault(event);
+                         self.send(Click(column.key, self.state.direction));
+                       }
+                     )>
+                     (
+                       self.state.key == column.key ?
+                         <Sort direction=self.state.direction /> :
+                         ReasonReact.nullElement
+                     )
+                     <Text value=column.display />
+                   </th>
+                 )
+              |> Array.of_list
+              |> ReasonReact.arrayToElement
+            )
+          </tr>
+        </thead>
+        <Currencies
+          columns=(List.length(columns))
+          direction=self.state.direction
+          sort_by=self.state.key
+          offset=self.state.offset
+        />
+      </table>
+      <br />
+      <div>
+        <ul className="pagination">
+          <li
+            onClick=(
+              event => {
+                ReactEventRe.Mouse.preventDefault(event);
+                self.send(Paginate(Next, self.state.offset));
+              }
+            )>
+            <Text value="Next 100" />
+          </li>
+          <li
+            onClick=(
+              event => {
+                ReactEventRe.Mouse.preventDefault(event);
+                self.send(Paginate(Previous, self.state.offset));
+              }
+            )>
+            <Text value="Previous 100" />
+          </li>
+        </ul>
+      </div>
+    </div>
 };
