@@ -1,27 +1,30 @@
-type action =
-  | List
-  | Detail(string);
+type route =
+  | Detail(string)
+  | List;
 
-type state = {page: action};
+type action =
+  | Navigate(route);
+
+type state = {page: route};
 
 let component = ReasonReact.reducerComponent("App");
 
 let make = _children => {
   ...component,
   initialState: () => {page: List},
-  reducer: (action, _state) =>
+  reducer: (action: action, _state) =>
     switch action {
-    | List => ReasonReact.Update({page: List})
-    | Detail(symbol) => ReasonReact.Update({page: Detail(symbol)})
+    | Navigate(Detail(code)) => ReasonReact.Update({page: Detail(code)})
+    | Navigate(List) => ReasonReact.Update({page: List})
     },
   subscriptions: self => [
     Sub(
       () =>
         ReasonReact.Router.watchUrl(url =>
           switch url.path {
-          | [] => self.send(List)
-          | [symbol] => self.send(Detail(symbol))
-          | _ => self.send(List)
+          | [] => self.send(Navigate(List))
+          | [symbol] => self.send(Navigate(Detail(symbol)))
+          | _ => self.send(Navigate(List))
           }
         ),
       ReasonReact.Router.unwatchUrl
@@ -31,8 +34,8 @@ let make = _children => {
     <div>
       (
         switch self.state.page {
-        | List => <Page title="Cryptocurrency Market Capitalizations" />
         | Detail(symbol) => <Text value=symbol />
+        | List => <Text value="List" />
         }
       )
     </div>
