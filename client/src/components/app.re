@@ -12,7 +12,7 @@ let component = ReasonReact.reducerComponent("App");
 let make = _children => {
   ...component,
   initialState: () => {page: List},
-  reducer: (action: action, _state) =>
+  reducer: (action, _state) =>
     switch action {
     | Navigate(Detail(code)) => ReasonReact.Update({page: Detail(code)})
     | Navigate(List) => ReasonReact.Update({page: List})
@@ -35,7 +35,7 @@ let make = _children => {
       (
         switch self.state.page {
         | Detail(symbol) => <Text value=symbol />
-        | List => <Text value="List" />
+        | List => <Page title="Cryptocurrency Market Capitalizations" />
         }
       )
     </div>
