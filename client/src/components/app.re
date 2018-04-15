@@ -5,17 +5,17 @@ type route =
 type action =
   | Navigate(route);
 
-type state = {page: route};
+type state = {route};
 
 let component = ReasonReact.reducerComponent("App");
 
 let make = _children => {
   ...component,
-  initialState: () => {page: List},
+  initialState: () => {route: List},
   reducer: (action, _state) =>
     switch action {
-    | Navigate(Detail(code)) => ReasonReact.Update({page: Detail(code)})
-    | Navigate(List) => ReasonReact.Update({page: List})
+    | Navigate(Detail(code)) => ReasonReact.Update({route: Detail(code)})
+    | Navigate(List) => ReasonReact.Update({route: List})
     },
   subscriptions: self => [
     Sub(
@@ -33,7 +33,7 @@ let make = _children => {
   render: self =>
     <div>
       (
-        switch self.state.page {
+        switch self.state.route {
         | Detail(symbol) => <Text value=symbol />
         | List => <Page title="Cryptocurrency Market Capitalizations" />
         }
