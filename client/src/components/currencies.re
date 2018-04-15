@@ -8,11 +8,16 @@ type action =
   | FetchCoinsFail
   | FetchCoinsSuccess(list(Coin.coin));
 
-let component = ReasonReact.reducerComponent("Currencies");
+type retainedProps = {offset: int};
+
+let component = ReasonReact.reducerComponentWithRetainedProps("Currencies");
 
 let make = (~columns, ~direction, ~limit, ~offset, ~sort_by, _children) => {
   ...component,
   initialState: _state => Fetching,
+  retainedProps: {
+    offset: offset
+  },
   reducer: (action, _state) =>
     switch action {
     | FetchCoins =>
@@ -35,10 +40,10 @@ let make = (~columns, ~direction, ~limit, ~offset, ~sort_by, _children) => {
     self.send(FetchCoins);
     ReasonReact.NoUpdate;
   },
-  willReceiveProps: self => {
-    self.send(FetchCoins);
-    self.state;
-  },
+  didUpdate: ({oldSelf, newSelf}) =>
+    if (oldSelf.retainedProps.offset !== newSelf.retainedProps.offset) {
+      newSelf.send(FetchCoins);
+    },
   render: self =>
     <tbody>
       (
