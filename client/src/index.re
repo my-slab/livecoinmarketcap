@@ -1,4 +1,1 @@
-ReactDOMRe.renderToElementWithId(
-  <Page message="Cryptocurrency Market Capitalizations" />,
-  "index"
-);
+ReactDOMRe.renderToElementWithId(<App />, "index");
