@@ -52,7 +52,6 @@ let make = _children => {
         | Next => offset + 100
         | Previous => offset == 0 ? offset : offset - 100
         };
-      Js.log(offset);
       ReasonReact.Update({...state, offset});
     },
   render: self =>
@@ -91,28 +90,5 @@ let make = _children => {
           offset=self.state.offset
         />
       </table>
-      <br />
-      <div>
-        <ul className="pagination">
-          <li
-            onClick=(
-              event => {
-                ReactEventRe.Mouse.preventDefault(event);
-                self.send(Paginate(Next, self.state.offset));
-              }
-            )>
-            <Text value="Next 100" />
-          </li>
-          <li
-            onClick=(
-              event => {
-                ReactEventRe.Mouse.preventDefault(event);
-                self.send(Paginate(Previous, self.state.offset));
-              }
-            )>
-            <Text value="Previous 100" />
-          </li>
-        </ul>
-      </div>
     </div>
 };
