@@ -1,15 +1,9 @@
-type paginate =
-  | Next
-  | Previous;
-
 type action =
-  | Click(string, Sort.direction)
-  | Paginate(paginate, int);
+  | Click(string, Sort.direction);
 
 type state = {
   direction: Sort.direction,
-  key: string,
-  offset: int
+  key: string
 };
 
 type column = {
@@ -29,30 +23,18 @@ let columns = [
   {display: "Change (24h)", key: "percent_change_24h"}
 ];
 
-let make = _children => {
+let make = (~limit: int, ~offset: int, _children) => {
   ...component,
   initialState: () => {
     direction: Desc,
-    key: columns |> List.hd |> (column => column.key),
-    offset: 0
+    key: columns |> List.hd |> (column => column.key)
   },
   reducer: (action, state) =>
     switch action {
     | Click(key, direction) =>
       key == state.key ?
-        ReasonReact.Update({
-          ...state,
-          direction: Sort.toggle(direction),
-          key
-        }) :
-        ReasonReact.Update({...state, direction: Desc, key})
-    | Paginate(direction, offset) =>
-      let offset =
-        switch direction {
-        | Next => offset + 100
-        | Previous => offset == 0 ? offset : offset - 100
-        };
-      ReasonReact.Update({...state, offset});
+        ReasonReact.Update({direction: Sort.toggle(direction), key}) :
+        ReasonReact.Update({direction: Desc, key})
     },
   render: self =>
     <div>
@@ -86,8 +68,9 @@ let make = _children => {
         <Currencies
           columns=(List.length(columns))
           direction=self.state.direction
+          limit
+          offset
           sort_by=self.state.key
-          offset=self.state.offset
         />
       </table>
     </div>

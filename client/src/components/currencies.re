@@ -10,17 +10,19 @@ type action =
 
 let component = ReasonReact.reducerComponent("Currencies");
 
-let make = (~columns, ~sort_by, ~direction, ~offset, _children) => {
+let make = (~columns, ~direction, ~limit, ~offset, ~sort_by, _children) => {
   ...component,
   initialState: _state => Fetching,
-  reducer: (a, _state) =>
-    switch a {
+  reducer: (action, _state) =>
+    switch action {
     | FetchCoins =>
       ReasonReact.UpdateWithSideEffects(
         Fetching,
         (
           self =>
             Coin.fetch_coins(
+              limit,
+              offset,
               coins => self.send(FetchCoinsSuccess(coins)),
               self.send(FetchCoinsFail)
             )
@@ -32,6 +34,10 @@ let make = (~columns, ~sort_by, ~direction, ~offset, _children) => {
   didMount: self => {
     self.send(FetchCoins);
     ReasonReact.NoUpdate;
+  },
+  willReceiveProps: self => {
+    self.send(FetchCoins);
+    self.state;
   },
   render: self =>
     <tbody>

@@ -30,10 +30,15 @@ module Decode = {
   let coins = json => json |> Json.Decode.list(decode);
 };
 
-let fetch_coins = (success, error) =>
+let fetch_coins = (limit, offset, success, error) =>
   Js.Promise.(
-    Fetch.fetch(api)
-    /* ++ string_of_int(offset) */
+    Fetch.fetch(
+      api
+      ++ "?start="
+      ++ string_of_int(offset)
+      ++ "&limit="
+      ++ string_of_int(limit)
+    )
     |> then_(Fetch.Response.json)
     |> then_(json => json |> Decode.coins |> success |> resolve)
     |> catch(err => {

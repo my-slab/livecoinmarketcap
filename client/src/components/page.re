@@ -51,7 +51,7 @@ let make = (~title: string, _children) => {
   render: self =>
     <div>
       <div> <h1> <Text value=title /> </h1> </div>
-      <Table />
+      <Table limit=self.state.limit offset=self.state.offset />
       <br />
       <Pagination limit=self.state.limit offset=self.state.offset />
     </div>
