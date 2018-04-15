@@ -30,7 +30,6 @@ let make = (~columns, ~sort_by, ~direction, ~offset, _children) => {
     | FetchCoinsSuccess(coins) => ReasonReact.Update(Success(coins))
     },
   didMount: self => {
-    Js.log(offset);
     self.send(FetchCoins);
     ReasonReact.NoUpdate;
   },
