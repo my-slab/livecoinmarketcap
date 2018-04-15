@@ -45,6 +45,7 @@ let make = (~limit: int, ~offset: int, _children) => {
               columns
               |> List.map(column =>
                    <th
+                     className="link"
                      key=column.key
                      onClick=(
                        event => {

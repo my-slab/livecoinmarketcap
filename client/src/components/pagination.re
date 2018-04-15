@@ -25,6 +25,7 @@ let make = (~limit: int, ~offset: int, _children) => {
     <div>
       <ul className="pagination">
         <li
+          className="link"
           onClick=(
             event => {
               ReactEventRe.Mouse.preventDefault(event);
@@ -34,6 +35,7 @@ let make = (~limit: int, ~offset: int, _children) => {
           <Text value="Next 100" />
         </li>
         <li
+          className="link"
           onClick=(
             event => {
               ReactEventRe.Mouse.preventDefault(event);
